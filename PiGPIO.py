@@ -15,9 +15,9 @@ class PiGPIO():
         GPIO.setup(pin_num, GPIO.IN)
 
     """Returns the value of the designated input pin number"""
-    def read_input(self, pin_num):
+    def read_pin(self, pin_num):
         return GPIO.input(pin_num)
 
     """Sets the output level of the designated output pin (Can be HIGH(True) or LOW(False))"""
-    def set_output(self, pin_num, state):
+    def set_pin(self, pin_num, state):
         GPIO.output(pin_num, state)
