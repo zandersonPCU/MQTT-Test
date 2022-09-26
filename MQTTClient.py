@@ -1,4 +1,6 @@
 import paho.mqtt.client as mqtt
+from servo_functions import move_servo
+
 
 class MQTT_Client(mqtt.Client):
 	
@@ -26,6 +28,25 @@ class MQTT_Client(mqtt.Client):
 	def on_disconnect(self, client, userdata, rc):
 		print("Disconnected result code " + str(rc))
 		client.loop_stop()
+		
+	def handle_message(self, msg, client, camera):
+		match msg.topic:
+			case "pi/camera":
+				if(msg.payload.decode("utf-8") == "take"):
+					camera.take_picture('/home/pi/Documents/Images')
 
+			case "pi/servo/1/angle":
+				angle = int(msg.payload.decode("utf-8"))
+				move_servo(0, angle)
+				client.publish("pi/servo/1/graph", angle)
 
+			case "pi/servo/2/angle":
+				angle = int(msg.payload.decode("utf-8"))
+				move_servo(1, angle)
+				client.publish("pi/servo/2/graph", angle)
+
+			case "pi/servo/3/angle":
+				angle = int(msg.payload.decode("utf-8"))
+				move_servo(2, angle)
+				client.publish("pi/servo/3/graph", angle)
 
