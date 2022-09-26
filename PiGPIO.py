@@ -5,7 +5,6 @@ class PiGPIO():
 
     def __init__(self):
         GPIO.setmode(GPIO.BCM)
-    
 
     """Sets the designated GPIO pin number to be an output pin"""
     def define_output(self, pin_num):

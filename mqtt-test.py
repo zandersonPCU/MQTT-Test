@@ -1,20 +1,19 @@
 import MQTTClient
 import PiGPIO
-import RPi.GPIO as GPIO
 import Camera
 from queue import Queue
+from servo_functions import move_servo
 
 io = PiGPIO.PiGPIO()
 messages = Queue()
 camera = Camera.Camera()
 
-topics = ["pi/pin7/output", "pi/camera", "pi/servo/1/angle", "pi/servo/2/angle", "pi/servo/3/angle", "pi/servo/4/angle"]
+topics = ["pi/camera", "pi/servo/1/angle", "pi/servo/2/angle", "pi/servo/3/angle", "pi/servo/4/angle"]
 
 client = MQTTClient.MQTT_Client("127.0.0.1", topics, messages)
 
 client.connect()
 io.define_output(4)
-
 
 #Infinite loop to check for messages from MQTT_Client
 while True:
@@ -27,14 +26,24 @@ while True:
 
         msg = messages.get()
 
-        client.handle_message(msg, client, io, camera)
+        match msg.topic:
+            case "pi/camera":
+                if(msg.payload.decode("utf-8") == "take"):
+                    camera.take_picture('/home/pi/Documents/Images')
 
+            case "pi/servo/1/angle":
+                angle = int(msg.payload.decode("utf-8"))
+                move_servo(0, angle)
+                client.publish("pi/servo/1/graph", angle)
 
+            case "pi/servo/2/angle":
+                angle = int(msg.payload.decode("utf-8"))
+                move_servo(1, angle)
+                client.publish("pi/servo/2/graph", angle)
+
+            case "pi/servo/3/angle":
+                angle = int(msg.payload.decode("utf-8"))
+                move_servo(2, angle)
+                client.publish("pi/servo/3/graph", angle)
+    
     client.loop_stop()
-
-
-
-
-
-
-
